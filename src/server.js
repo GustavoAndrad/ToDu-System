@@ -9,9 +9,9 @@ routes(app);
 
 const PORT = process.env.PORT || 3000;
 const HOST = process.env.HOST;
-const ENVIROMENT = process.env.NODE_ENV;
+const ENVIRONMENT = process.env.NODE_ENV;
 
 app.listen(PORT, HOST, ()=>{
   console.log(`Server listening on: http://${HOST}:${PORT}`);
-  console.log(`Enviroment: ${ENVIROMENT}`);
+  console.log(`Enviroment: ${ENVIRONMENT}`);
 });
