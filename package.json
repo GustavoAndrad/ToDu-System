@@ -3,10 +3,12 @@
   "version": "1.0.0",
   "description": "",
   "main": "src/server.js",
+  "type": "module",
   "scripts": {
     "dev": "nodemon -L src/server.js",
     "start": "node src/server.js",
-    "lint-setup": "npx @eslint/migrate-config .eslintrc.json && npx eslint . --fix"
+    "lint-setup-migrate": "npx @eslint/migrate-config .eslintrc.json && npx eslint . --fix",
+    "lint": "npx eslint . --fix"
   },
   "keywords": [],
   "author": "",
