@@ -1,6 +1,4 @@
-/* eslint-disable linebreak-style */
-/* eslint-disable linebreak-style */
-
+ 
 exports.up = function(knex) {
   return knex.schema
     .createTable("Task",(table) => {
