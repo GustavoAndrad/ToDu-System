@@ -1,0 +1,42 @@
+version: "3.9"
+services: 
+  todu_database:
+    container_name: todu_database
+    image: mysql
+    env_file: 
+      - .env
+    ports:
+      - "4000:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: root
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - todu_database:/var/lib/mysql
+    networks:
+      - todu_bridge
+  
+  todu_api:
+    depends_on:
+      - todu_database
+    container_name: todu_app
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    volumes:
+      - ./:/home/app
+    ports:
+      - "3000:3000"
+    expose:
+      - 3000
+    networks:
+      - todu_bridge
+
+volumes:
+  todu_database:
+    driver: local
+
+networks:
+  todu_bridge:
+    driver: bridge
