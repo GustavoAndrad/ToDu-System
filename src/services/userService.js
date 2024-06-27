@@ -1,8 +1,9 @@
 import database from "../database/index.js";
+import jwt from "jsonwebtoken";
 import { v4 } from "uuid";
-import { generateHash } from "../utils/crypt_security.js";
+import { generateHash, login_compare } from "../utils/crypt_security.js";
 import { UserValidator } from "../utils/joi_validator.js";
-import { EmailAlredyRegistered, UserNotFound } from "../erros/userErro.js";
+import { EmailAlredyRegistered, EmailNotRegistered, IncorretPassword, UserNotFound } from "../erros/userErro.js";
 
 class UserService{
 
@@ -18,7 +19,7 @@ class UserService{
   }
 
   //Método absolutamente confidencial. Informações sensíveis sobre todos os usuários. Não torná-lo acessível.
-  async #getAllUser(){
+  static async #getAllUser(){
     const users = await database("User").select("*");
 
     if(users.length === 0) throw new UserNotFound();
@@ -27,11 +28,10 @@ class UserService{
   }
 
   static async createUser(name, date, email, password, repeat_password, notificate){
-
-    const auxiliarInstance = new UserService(); // Acessar método privado
-    const users = await auxiliarInstance.#getAllUser();
-    
+ 
     //Verificando se já existe algum usuário com este e-mail
+    const users = await this.#getAllUser();
+
     for(const user_check of users){
       if(user_check.EMAIL === email){
         throw new EmailAlredyRegistered();
@@ -57,6 +57,28 @@ class UserService{
     }
 
     await database("User").insert(user);
+
+    return user.ID;
+  }
+
+  static async login({email, password}){
+
+    await UserValidator.validateLogin({email, password});
+
+    const registered_user = await database("User").select("PASSWORD", "ID").where({EMAIL:email}).first();
+    const registered_password = registered_user.PASSWORD;
+
+    if(!registered_password){
+      throw new EmailNotRegistered();
+    }
+
+    const isPasswordEqual = await login_compare(password, registered_password);
+    if(!isPasswordEqual){
+      throw new IncorretPassword();
+    }
+
+    const payload = {id: registered_user.ID};
+    return jwt.sign(payload, process.env.TOKEN_KEY, {expiresIn: "10h"});
   }
 }
 

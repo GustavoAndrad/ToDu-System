@@ -1,14 +1,14 @@
-import { HttpErro, ImprevistError } from "../erros/erro.config.js";
+import { HttpCode, HttpErro, ImprevistError } from "../erros/erro.config.js";
 import UserService from "../services/userService.js";
 
 class UserController{
   static async getUser(req, res){
     try{
-      const id_usuario = req.params.id;
+      const id_usuario = req.user_id;
 
       const user = await UserService.getUser(id_usuario);
       
-      res.status(200).json(user);
+      res.status(HttpCode.OK).json(user);
     
     } catch(e){
       
@@ -27,9 +27,9 @@ class UserController{
     try{
       const {name, date, email, password, repeat_password, notificate} = req.body;
         
-      await UserService.createUser(name, date, email, password, repeat_password, notificate);
+      const new_user_id = await UserService.createUser(name, date, email, password, repeat_password, notificate);
       
-      res.status(201).json({message: "Created"});
+      res.status(HttpCode.CREATED).json({message: "Sucessfully Created", public_id: new_user_id});
     
     } catch(e){
 
@@ -40,6 +40,27 @@ class UserController{
       } else{
         const erro_classificado = new ImprevistError(e.message);
         erro_classificado.sendMessage(res);
+      }
+    }
+  }
+
+  static async login(req, res){
+    try{
+      const {email, password} = req.body;
+
+      const acess_token = await UserService.login({email, password});
+
+      res.status(HttpCode.OK).json({token: acess_token});
+
+    } catch(e){
+
+      console.log(e);
+
+      if(e instanceof HttpErro){
+        e.sendMessage(res);
+      } else{
+        const erro_imprevisto = new ImprevistError(e.message);
+        erro_imprevisto.sendMessage(res);
       }
     }
   }

@@ -12,3 +12,7 @@ export async function generateHash(data){
   const hash = await bcrypt.hash(data, salt);
   return hash;
 }
+
+export async function login_compare(password, registered_password){
+  return ( await bcrypt.compare(password, registered_password) );
+}

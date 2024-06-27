@@ -61,5 +61,33 @@ export class UserValidator {
     }
   }
 
+  static async validateLogin({email, password}){
+    try{
+      const schema = Joi.object({
+        email: Joi.string()
+          .email()
+          .max(255)
+          .required()
+          .messages({
+            "string.email": "Email inválido",
+            "string.max": "O email deve ter no máximo 255 caracteres",
+            "any.required": "O email é obrigatório"
+          }),
+
+        password: Joi.string()
+          .min(8)
+          .required()
+          .messages({
+            "string.min": "A senha precisa ter pelo menos 8 caracteres",
+            "any.required": "A senha é obrigatória"
+          }),
+
+      });
+
+      await schema.validateAsync({ email, password });
+    } catch(e){
+      throw new JoiValidatorError(e.message);
+    }
+  }
   
 }

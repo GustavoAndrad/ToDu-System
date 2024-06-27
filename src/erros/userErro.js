@@ -12,3 +12,14 @@ export class EmailAlredyRegistered extends HttpErro{
   }
 }
 
+export class EmailNotRegistered extends HttpErro{
+  constructor(message = "Email não registrado"){
+    super(HttpCode.NOT_FOUND, message);
+  }
+}
+
+export class IncorretPassword extends HttpErro{
+  constructor(message = "Senha Incorreta"){
+    super(HttpCode.UNAUTHORIZED, message);
+  }
+}
