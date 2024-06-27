@@ -9,7 +9,7 @@ exports.up = function(knex) {
       table.string("PASSWORD", 60).notNullable();
       table.boolean("NOTIFICATE").notNullable().defaultTo(true);
       table.tinyint("HOURS_NOTIFICATION").notNullable().unsigned().defaultTo(24);
-      table.smallint("IDENTIDY_CODE").notNullable().unsigned().defaultTo(null);
+      table.smallint("IDENTIDY_CODE").unsigned().defaultTo(null);
 
     });
 };
