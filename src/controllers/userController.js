@@ -4,9 +4,9 @@ import UserService from "../services/userService.js";
 class UserController{
   static async getUser(req, res){
     try{
-      const id_usuario = req.user_id;
+      const id_user = req.user_id;
 
-      const user = await UserService.getUser(id_usuario);
+      const user = await UserService.getUser(id_user);
       
       res.status(HttpCode.OK).json(user);
     

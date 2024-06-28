@@ -18,8 +18,8 @@ class UserService{
     return user;
   }
 
-  //Método absolutamente confidencial. Informações sensíveis sobre todos os usuários. Não torná-lo acessível.
-  static async #getAllUser(){
+  //Método de uso interno. Não associá-lo diretamente a uma rota
+  static async getAllUser(){
     const users = await database("User").select("*");
 
     if(users.length === 0) throw new UserNotFound();
@@ -30,7 +30,7 @@ class UserService{
   static async createUser(name, date, email, password, repeat_password, notificate){
  
     //Verificando se já existe algum usuário com este e-mail
-    const users = await this.#getAllUser();
+    const users = await this.getAllUser();
 
     for(const user_check of users){
       if(user_check.EMAIL === email){
@@ -66,11 +66,12 @@ class UserService{
     await UserValidator.validateLogin({email, password});
 
     const registered_user = await database("User").select("PASSWORD", "ID").where({EMAIL:email}).first();
-    const registered_password = registered_user.PASSWORD;
-
-    if(!registered_password){
+    
+    if(!registered_user){
       throw new EmailNotRegistered();
     }
+    
+    const registered_password = registered_user.PASSWORD;
 
     const isPasswordEqual = await login_compare(password, registered_password);
     if(!isPasswordEqual){

@@ -1,13 +1,13 @@
 import { Router } from "express";
 import UserController from "../controllers/userController.js";
-import auth from "../middleware/auth.js";
+import auth from "../middleware/login_auth.js";
 
 const user_router = Router();
 
 user_router
-  .get("/user", auth, UserController.getUser)
   .post("/user", UserController.createUser)
-//  .patch("/user")
+  .get("/user", auth, UserController.getUser)
+//  .patch("/user", )
 //  .delete("/user");
 
   .post("/user/login", UserController.login);
