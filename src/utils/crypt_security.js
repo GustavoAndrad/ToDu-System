@@ -7,12 +7,23 @@ async function generateSalt(){
   return salt;
 }
 
+/**
+ * @description Gera e retorna o salted hash de uma string.
+ * @param {string} data - A string a ser hashada.
+ * @returns {Promise<string>} - O hash gerado.
+ */
 export async function generateHash(data){
   const salt = await generateSalt();
   const hash = await bcrypt.hash(data, salt);
   return hash;
 }
 
+/**
+ * @description Compara uma string de senha com uma hash. Se forem compatíveis, retorna verdadeiro, se não, retorna falso.
+ * @param {*} password
+ * @param {*} registered_password 
+ * @returns {Promise<boolean>}
+ */
 export async function login_compare(password, registered_password){
   return ( await bcrypt.compare(password, registered_password) );
 }

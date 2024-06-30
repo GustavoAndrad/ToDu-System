@@ -12,7 +12,9 @@ const ENVIRONMENT = process.env.NODE_ENV;
 const app = express();
 routes(app);
 
-if(await try_database_conection()){
+const isConectedToDatabase = await try_database_conection();
+
+if(isConectedToDatabase){
 
   app.listen(PORT, HOST, async ()=>{
     console.log(`Server listening on: http://${HOST}:${PORT}`);

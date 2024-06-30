@@ -1,5 +1,5 @@
 import user_router  from "./userRoutes.js";
-import auth_router from "./authRoutes.js";
+import two_factor_router from "./twoFactorVerifyRoutes.js";
 import express from "express";
 
 const routes = (app) => {
@@ -7,7 +7,7 @@ const routes = (app) => {
   app
     .use(express.json())
     .use(user_router)
-    .use(auth_router)
+    .use(two_factor_router)
 
     .use("/", (req, res) =>{
       res.status(200).json({message : "Server connection sucessfully stablished"});

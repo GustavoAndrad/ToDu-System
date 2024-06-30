@@ -1,6 +1,11 @@
 import Joi from "joi";
 import { JoiValidatorError } from "../erros/erro.config.js";
 
+/**
+ * @description 
+ * Classe com métodos estáticos para validação de entradas. Utiliza a biblioteca Joi.
+ * Os métodos também tratam de instanciar os erros de validação a serem enviados nas respostas de requisições http 
+ */
 export class UserValidator {
   static async validateCreate({ name, date, email, password, repeat_password, notificate }) {
     try{

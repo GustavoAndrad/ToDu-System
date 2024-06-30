@@ -10,7 +10,6 @@ export default function auth(req, res, next){
       throw new TokenNotInformed();
     }
 
-    
     const [prefix, token] = auth.split(" ");
     
     if(prefix!=="Bearer" && !token){
@@ -20,7 +19,7 @@ export default function auth(req, res, next){
     jwt.verify(token, process.env.TOKEN_KEY, (error,data) => {
 
       if(error){
-        throw new InvalidToken(error.message);
+        throw new InvalidToken("Token inválido: " + error.message);
       }
       else{
         req.user_id = data.id;

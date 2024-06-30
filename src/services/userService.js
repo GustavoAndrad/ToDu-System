@@ -9,7 +9,7 @@ class UserService{
 
   static async getUser(id){
     const user = await database("User")
-      .select("ID","NOME","DATE_BIRTH", "EMAIL", "NOTIFICATE", "HOURS_NOTIFICATION")
+      .select("ID","NAME","DATE_BIRTH", "EMAIL", "NOTIFICATE", "HOURS_NOTIFICATION")
       .where({id})
       .first();
 
@@ -18,20 +18,11 @@ class UserService{
     return user;
   }
 
-  //Método de uso interno. Não associá-lo diretamente a uma rota
-  static async getAllUser(){
-    const users = await database("User").select("*");
-
-    if(users.length === 0) throw new UserNotFound();
-
-    return users;
-  }
-
   static async createUser(name, date, email, password, repeat_password, notificate){
  
     //Verificando se já existe algum usuário com este e-mail
-    const users = await this.getAllUser();
-
+    const users = await database("User").select("*");
+    
     for(const user_check of users){
       if(user_check.EMAIL === email){
         throw new EmailAlredyRegistered();
@@ -44,7 +35,7 @@ class UserService{
     
     const user = {
       ID: v4(),
-      NOME: name,
+      NAME: name,
       DATE_BIRTH: date,
       EMAIL: email,
       PASSWORD: passwordHash,
@@ -79,7 +70,7 @@ class UserService{
     }
 
     const payload = {id: registered_user.ID};
-    return jwt.sign(payload, process.env.TOKEN_KEY, {expiresIn: "10h"});
+    return jwt.sign(payload, process.env.TOKEN_KEY, {expiresIn: "24h"});
   }
 }
 
