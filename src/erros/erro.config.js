@@ -49,6 +49,7 @@ export class HttpErro extends Error{
 
 }
 
+//Classes genéricas de erros comuns entre funcionalidades
 export class ImprevistError extends HttpErro{
   constructor(message){
     super(HttpCode.INTERNAL_SERVER_ERROR, "Um erro inesperado aconteceu. --- " + message);
@@ -58,5 +59,10 @@ export class ImprevistError extends HttpErro{
 export class JoiValidatorError extends HttpErro{
   constructor(message = "Erro ao validar entradas"){
     super(HttpCode.BAD_REQUEST, "Erro de validação: " + message);
+  }
+}
+export class MailerError extends HttpErro{
+  constructor(message = "Erro ao enviar e-mail"){
+    super(HttpCode.INTERNAL_SERVER_ERROR, "Erro ao enviar e-mail: " + message);
   }
 }

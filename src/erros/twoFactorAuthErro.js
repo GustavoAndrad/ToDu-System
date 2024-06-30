@@ -1,7 +1,17 @@
 import { HttpCode, HttpErro } from "./erro.config.js";
 
-export class MailerError extends HttpErro{
-  constructor(message = "Erro ao enviar e-mail"){
-    super(HttpCode.INTERNAL_SERVER_ERROR, "Erro ao enviar e-mail: " + message);
+export class InvalidCode extends HttpErro{
+  constructor(message = "Código inválido"){
+    super(HttpCode.BAD_REQUEST, message);
+  }
+}
+export class IncompatibleCode extends HttpErro{
+  constructor(message = "Código incorreto"){
+    super(HttpCode.UNAUTHORIZED, message);
+  }
+}
+export class ExpiredCode extends HttpErro{
+  constructor(message = "Código expirado"){
+    super(HttpCode.UNAUTHORIZED, message);
   }
 }

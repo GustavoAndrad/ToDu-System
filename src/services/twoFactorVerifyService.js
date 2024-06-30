@@ -1,9 +1,12 @@
+import "dotenv/config";
 import database from "../database/index.js";
-import { MailerError } from "../erros/twoFactorAuthErro.js";
+import { MailerError } from "../erros/erro.config.js";
+import { ExpiredCode, IncompatibleCode, InvalidCode } from "../erros/twoFactorAuthErro.js";
 import Mailer from "../utils/mailer.js";
 import { generateCode } from "../utils/two_factor_code.js";
 import UserService from "./userService.js";
-import { addMinutes, format } from "date-fns";
+import { addMinutes, format, isBefore, parse } from "date-fns";
+import jwt from "jsonwebtoken";
 
 class TwoFactorVerifyService{
 
@@ -23,6 +26,14 @@ class TwoFactorVerifyService{
     if(isAlredySended){
       await database("Code_2FA").where({ID_USER: user_id}).del();
     }
+  }
+
+  /**@private*/
+  static #isValidCode(code){
+    if(typeof(code)==="number" && code >= 10000 && code<=65535){
+      return true;
+    }
+    return false;
   }
 
   static async sendCode(user_id){
@@ -68,6 +79,44 @@ class TwoFactorVerifyService{
     
 
     return user_email;
+  }
+
+  static async verifyCode(informed_code, user_id){
+
+    if(!(this.#isValidCode(informed_code))){
+      throw new InvalidCode();
+    }
+
+    const registered_code = await database("Code_2FA")
+      .select("*")
+      .where("IDENTITY_CODE", informed_code)
+      .andWhere("ID_USER", user_id)
+      .first();
+
+    if(!registered_code){
+      throw new IncompatibleCode();
+    }
+
+    const expirationDate = new Date(registered_code.EXPIRATION_DATE);
+    const expirationDateString = expirationDate.toISOString().slice(0, 19).replace("T", " ");
+
+    const expire_date = parse(expirationDateString, "yyyy-MM-dd HH:mm:ss", new Date());
+    const actual_date = new Date();
+
+    const isValid = isBefore(actual_date, expire_date);
+
+    if(!isValid){
+      throw new ExpiredCode();
+    }
+
+    const payload = {
+      status: true,
+      permission_key: process.env.PERMISSION_KEY,
+      id: registered_code.ID_USER
+    };
+
+    return jwt.sign(payload, process.env.TOKEN_KEY, {expiresIn: "1h"});
+
   }
 }
 
