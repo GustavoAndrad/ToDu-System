@@ -24,6 +24,6 @@ export async function generateHash(data){
  * @param {*} registered_password 
  * @returns {Promise<boolean>}
  */
-export async function login_compare(password, registered_password){
+export async function password_compare(password, registered_password){
   return ( await bcrypt.compare(password, registered_password) );
 }

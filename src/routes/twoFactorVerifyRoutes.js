@@ -1,12 +1,12 @@
 import Router from "express";
-import auth from "../middleware/login_auth.js";
+import login_auth from "../middleware/login_auth.js";
 import TwoFactorVerifyController from "../controllers/twoFactorVerifyController.js";
 
 const two_factor_router = Router();
 
 two_factor_router
-  .post("/two_factor/sendCode", auth, TwoFactorVerifyController.sendCode)
-  .post("/two_factor/verifyCode", auth, TwoFactorVerifyController.verifyCode);
+  .post("/two_factor/sendCode", login_auth, TwoFactorVerifyController.sendCode)
+  .post("/two_factor/verifyCode", login_auth, TwoFactorVerifyController.verifyCode);
 
 
 export default two_factor_router;

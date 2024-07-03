@@ -2,7 +2,7 @@ import jwt from "jsonwebtoken";
 import { BadFormatToken, InvalidToken, TokenNotInformed } from "../erros/authErro.js";
 import { HttpErro, ImprevistError } from "../erros/erro.config.js";
 
-export default function auth(req, res, next){
+export default function authentication_login(req, res, next){
   try{
     const auth = req.headers.authorization;
 
@@ -12,11 +12,11 @@ export default function auth(req, res, next){
 
     const [prefix, token] = auth.split(" ");
     
-    if(prefix!=="Bearer" && !token){
+    if(prefix!=="Bearer" || !token){
       throw new BadFormatToken();
     }
     
-    jwt.verify(token, process.env.TOKEN_KEY, (error,data) => {
+    jwt.verify(token, process.env.LOGIN_TOKEN_KEY, (error,data) => {
 
       if(error){
         throw new InvalidToken("Token inválido: " + error.message);

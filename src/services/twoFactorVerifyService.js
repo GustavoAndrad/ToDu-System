@@ -5,8 +5,9 @@ import { ExpiredCode, IncompatibleCode, InvalidCode } from "../erros/twoFactorAu
 import Mailer from "../utils/mailer.js";
 import { generateCode } from "../utils/two_factor_code.js";
 import UserService from "./userService.js";
-import { addMinutes, format, isBefore, parse } from "date-fns";
+import { addMinutes, format, isAfter, isBefore, parse } from "date-fns";
 import jwt from "jsonwebtoken";
+import hideEmail from "../utils/hideEmailAdress.js";
 
 class TwoFactorVerifyService{
 
@@ -22,7 +23,7 @@ class TwoFactorVerifyService{
 
     const isAlredySended = user_with_code.some(user => user.ID_USER === user_id);
 
-    //Se o usuário já tiver u código, ele é apagado
+    //Se o usuário já tiver um código, ele é apagado
     if(isAlredySended){
       await database("Code_2FA").where({ID_USER: user_id}).del();
     }
@@ -40,8 +41,9 @@ class TwoFactorVerifyService{
     
     /*
       Code é uma entidade única na base de dados. Cada registro deve ser único. 
-      Um usuário só pode ter um code relacionado a ele, se ele solicitar e já houver, o antigo será excluído.
-      É gerado um código até ele ser único dentro de [10000,65535], colaborando para a eficiência da operação.
+      Um usuário só pode ter um code relacionado a ele, caso haja solicitação e já houver algum, o antigo será excluído.
+      É gerado um código até que seja único dentro de [10000,65535], colaborando para a eficiência da operação.
+      Cabe refatoração do algoritimo  de geração em caso de escalabilidade da aplicação, mas para fins de estudo cumpre suas necessidades
     */
     await this.#verifyAlredySendedCode(user_id);
 
@@ -54,8 +56,8 @@ class TwoFactorVerifyService{
 
 
     //Gerando horário de validade do código
-    const qnt_minutos_to_expire = 10;
-    const expiration_date = format(addMinutes(new Date(), qnt_minutos_to_expire), "yyyy-MM-dd HH:mm:ss");
+    const qnt_minutes_to_expire = 10;
+    const expiration_date = format(addMinutes(new Date(), qnt_minutes_to_expire), "yyyy-MM-dd HH:mm:ss");
 
     //Inserindo as informações do código no banco de dados
     const code_set = {
@@ -67,7 +69,7 @@ class TwoFactorVerifyService{
     await database("Code_2FA").insert(code_set);
     
     //Construindo e enviando e-mail
-    const user = await UserService.getUser(user_id);
+    const user = await database("User").select("EMAIL").where({ID: user_id}).first();
     const user_email = user.EMAIL;
     
     const mailer = new Mailer();
@@ -77,8 +79,8 @@ class TwoFactorVerifyService{
       throw new MailerError(isSended.message);
     }
     
-
-    return user_email;
+    const formated_email = hideEmail(user_email);
+    return formated_email;
   }
 
   static async verifyCode(informed_code, user_id){
@@ -98,24 +100,24 @@ class TwoFactorVerifyService{
     }
 
     const expirationDate = new Date(registered_code.EXPIRATION_DATE);
-    const expirationDateString = expirationDate.toISOString().slice(0, 19).replace("T", " ");
+    const format_expiration_date = expirationDate.toISOString().slice(0, 19).replace("T", " ");
 
-    const expire_date = parse(expirationDateString, "yyyy-MM-dd HH:mm:ss", new Date());
+    const expire_date = parse(format_expiration_date, "yyyy-MM-dd HH:mm:ss", new Date());
     const actual_date = new Date();
 
-    const isValid = isBefore(actual_date, expire_date);
+    const is_expired = isBefore(expire_date, actual_date);
 
-    if(!isValid){
+    if(is_expired){
       throw new ExpiredCode();
     }
 
     const payload = {
       status: true,
       permission_key: process.env.PERMISSION_KEY,
-      id: registered_code.ID_USER
     };
 
-    return jwt.sign(payload, process.env.TOKEN_KEY, {expiresIn: "1h"});
+    // O token é valido por 1 hora, depois disso o processo de 2FA deve ser completamente refeito
+    return jwt.sign(payload, process.env.PERMISSION_TOKEN_KEY, {expiresIn: "1h"});
 
   }
 }

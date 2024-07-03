@@ -44,16 +44,81 @@ class UserController{
     }
   }
 
+  static async updateUser(req, res){
+    try{
+      const {name, date, notificate, hours_notification} = req.body;
+      const user_id = req.user_id;
+        
+      await UserService.updateUser(user_id, name, date, notificate, hours_notification);
+      
+      res.status(HttpCode.OK).json({message: "Sucessfully Updated"});
+    
+    } catch(e){
+
+      console.log(e);
+
+      if(e instanceof HttpErro){
+        e.sendMessage(res);
+      } else{
+        const erro_classificado = new ImprevistError(e.message);
+        erro_classificado.sendMessage(res);
+      }
+    }
+  }
+
+  static async dangerUpdateUser(req, res){
+    try{
+      const {actual_email, new_email, actual_pass, new_pass} = req.body;
+      const user_id = req.user_id;
+        
+      await UserService.dangerUpdateUser(user_id,actual_email, new_email, actual_pass, new_pass);
+      
+      res.status(HttpCode.OK).json({message: "Sucessfully Updated"});
+    
+    } catch(e){
+
+      console.log(e);
+
+      if(e instanceof HttpErro){
+        e.sendMessage(res);
+      } else{
+        const erro_classificado = new ImprevistError(e.message);
+        erro_classificado.sendMessage(res);
+      }
+    }
+  }
+
   static async login(req, res){
     try{
       const {email, password} = req.body;
 
-      const acess_token = await UserService.login({email, password});
+      const acess_token = await UserService.login(email, password);
 
       res.status(HttpCode.OK).json({token: acess_token});
 
     } catch(e){
 
+      console.log(e);
+
+      if(e instanceof HttpErro){
+        e.sendMessage(res);
+      } else{
+        const erro_imprevisto = new ImprevistError(e.message);
+        erro_imprevisto.sendMessage(res);
+      }
+    }
+  }
+
+  static async verifyPassword(req, res){
+    try{
+      const user_id = req.user_id;
+      const password = req.body.password;
+
+      const permission_token = await UserService.verifyPassword(user_id, password);
+
+      res.status(HttpCode.OK).json({verified_pass_token: permission_token});
+    }catch(e){
+      
       console.log(e);
 
       if(e instanceof HttpErro){

@@ -23,3 +23,9 @@ export class IncorretPassword extends HttpErro{
     super(HttpCode.UNAUTHORIZED, message);
   }
 }
+
+export class NothingToUpdate extends HttpErro{
+  constructor(message = "Nenhuma informação nova foi passada para ser atualizada"){
+    super(HttpCode.BAD_REQUEST, message);
+  }
+}

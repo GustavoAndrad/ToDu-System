@@ -51,12 +51,16 @@ class Mailer {
 
                 header{
                     background-color: #FFEA05;
-                    color: #3E3E96;
                     width: 100%;
+                    color: #3E3E96;
                     padding-top: 1%;
                     padding-bottom: 1%;
-                    text-align: center;
                     border-radius: 100px;
+                }
+                
+                h1{
+                  width: 100%;
+                  text-align: center;
                 }
 
                 main{
