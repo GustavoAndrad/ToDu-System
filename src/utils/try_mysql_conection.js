@@ -3,7 +3,8 @@ import mysql from "mysql2/promise";
 const { DB_PASSWORD, DB_NAME, DB_HOST, DB_PORT, DB_USER } = process.env;
 
 /**
- *  @description Testa conexão com banco de dados determinado nas variáveis de ambiente.
+ * @description Testa conexão com banco de dados determinado nas variáveis de ambiente.
+ * @async
 */
 async function try_database_conection(){
   try {

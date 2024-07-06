@@ -4,8 +4,7 @@ import { MailerError } from "../erros/erro.config.js";
 import { ExpiredCode, IncompatibleCode, InvalidCode } from "../erros/twoFactorAuthErro.js";
 import Mailer from "../utils/mailer.js";
 import { generateCode } from "../utils/two_factor_code.js";
-import UserService from "./userService.js";
-import { addMinutes, format, isAfter, isBefore, parse } from "date-fns";
+import { addMinutes, format, isBefore, parse } from "date-fns";
 import jwt from "jsonwebtoken";
 import hideEmail from "../utils/hideEmailAdress.js";
 

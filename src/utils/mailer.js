@@ -25,6 +25,7 @@ class Mailer {
    * @param {string} code - O código de verificação a ser enviado.
    * @param {string} user_email - O e-mail do usuário que receberá o código de verificação.
    * @returns {Promise<{status: boolean, message: string}>} - Um objeto contendo o status booleno e uma string ['ok' ou <mensagem de erro>].
+   * @async 
    */
   async sendCodeMail(code, user_email) {
     const mailOptions = {

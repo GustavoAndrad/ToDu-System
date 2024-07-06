@@ -48,7 +48,8 @@ class UserController{
     try{
       const {name, date, notificate, hours_notification} = req.body;
       const user_id = req.user_id;
-        
+      
+      await UserService.getUser(user_id); //Verificando se o id confere
       await UserService.updateUser(user_id, name, date, notificate, hours_notification);
       
       res.status(HttpCode.OK).json({message: "Sucessfully Updated"});
@@ -70,7 +71,8 @@ class UserController{
     try{
       const {actual_email, new_email, actual_pass, new_pass} = req.body;
       const user_id = req.user_id;
-        
+
+      await UserService.getUser(user_id); //Verificando se o id confere
       await UserService.dangerUpdateUser(user_id,actual_email, new_email, actual_pass, new_pass);
       
       res.status(HttpCode.OK).json({message: "Sucessfully Updated"});
@@ -84,6 +86,28 @@ class UserController{
       } else{
         const erro_classificado = new ImprevistError(e.message);
         erro_classificado.sendMessage(res);
+      }
+    }
+  }
+
+  static async deleteUser(req, res){
+    try{
+      const id_user = req.user_id;
+
+      await UserService.getUser(id_user); //Verificando se o id confere
+      await UserService.deleteUser(id_user);
+      
+      res.status(HttpCode.OK).json({message: "Sucessfuly deleted. You no longer have acess to your account"});
+    
+    } catch(e){
+      
+      console.log(e);
+
+      if(e instanceof HttpErro){
+        e.sendMessage(res);
+      } else{
+        const erro_imprevisto = new ImprevistError(e.message);
+        erro_imprevisto.sendMessage(res);
       }
     }
   }

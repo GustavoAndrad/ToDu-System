@@ -2,7 +2,7 @@
 import "dotenv/config";
 import express from "express";
 import routes from "./routes/index.js";
-import try_database_conection from "./utils/try_database_conection.js";
+import try_database_conection from "./utils/try_mysql_conection.js";
 
 const PORT = process.env.PORT || 3000;
 const HOST = process.env.HOST;

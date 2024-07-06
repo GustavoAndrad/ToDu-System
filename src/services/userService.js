@@ -102,6 +102,15 @@ class UserService{
     await database("User").update(new_user).where({id});
   }
 
+  static async deleteUser(id){
+    const user = await database("User").select("*").where({id});
+    if(!user){
+      throw new UserNotFound();
+    }
+
+    await database("User").where({id}).del();
+  }
+
   static async login(email, password){
 
     await UserValidator.validateLogin({email, password});
@@ -128,7 +137,7 @@ class UserService{
 
     if(!registered_user) throw new UserNotFound();
 
-    const isPasswordEqual = password_compare(informed_password, registered_user.PASSWORD);
+    const isPasswordEqual = await password_compare(informed_password, registered_user.PASSWORD);
     if(!isPasswordEqual) throw new IncorretPassword();
 
     const payload = {is_password_verified: true};
