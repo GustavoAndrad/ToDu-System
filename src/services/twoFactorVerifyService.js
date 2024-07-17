@@ -98,8 +98,8 @@ class TwoFactorVerifyService{
       throw new IncompatibleCode();
     }
 
-    const expirationDate = new Date(registered_code.EXPIRATION_DATE);
-    const format_expiration_date = expirationDate.toISOString().slice(0, 19).replace("T", " ");
+    const expiration_base_date = new Date(registered_code.EXPIRATION_DATE);
+    const format_expiration_date = expiration_base_date.toISOString().slice(0, 19).replace("T", " ");
 
     const expire_date = parse(format_expiration_date, "yyyy-MM-dd HH:mm:ss", new Date());
     const actual_date = new Date();

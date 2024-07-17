@@ -5,6 +5,7 @@ import { generateHash, password_compare } from "../utils/crypt_security.js";
 import { UserValidator } from "../utils/joi_validator.js";
 import { EmailAlredyRegistered, EmailNotRegistered, IncorretPassword, NothingToUpdate, UserNotFound } from "../erros/userErro.js";
 import hideEmail from "../utils/hideEmailAdress.js";
+import { format } from "date-fns";
 
 class UserService{
 
@@ -18,8 +19,8 @@ class UserService{
 
     //Reescrita para proteger e facilitar a interpretação dos dados
     user.NOTIFICATE = (user.NOTIFICATE)==1 ? true : false;
-
     user.EMAIL = hideEmail(user.EMAIL);
+    user.DATE_BIRTH = format(new Date(user.DATE_BIRTH), "yyyy-MM-dd");
     
     return user;
   }

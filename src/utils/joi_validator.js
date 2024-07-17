@@ -3,7 +3,7 @@ import { JoiValidatorError } from "../erros/erro.config.js";
 
 /**
  * @description 
- * Classe com métodos estáticos para validação de entradas. Utiliza a biblioteca Joi.
+ * Classe com métodos estáticos para validação de entradas de USUÁRIOS. Utiliza a biblioteca Joi.
  * Os métodos também tratam de instanciar os erros de validação a serem enviados nas respostas de requisições http 
  */
 export class UserValidator {
@@ -28,6 +28,7 @@ export class UserValidator {
           .max("now")
           .messages({
             "any.required": "A data é obrigatória",
+            "date.base": "A data de nascimento deve ser uma data",
             "date.min": "A data deve ser posterior a 01/01/1920",
             "date.max": "A data não pode ser no futuro"
           }),
@@ -194,4 +195,125 @@ export class UserValidator {
     }
   }  
   
+}
+
+const statusEnum = {
+  PENDING: "PENDING",
+  DONE: "DONE",
+  IN_PROGRESS: "IN PROGRESS",
+  LATE: "LATE"
+};
+
+const priorityEnum = {
+  LOW: "LOW",
+  MID: "MID",
+  HIGH: "HIGH",
+};
+/**
+ * @description 
+ * Classe com métodos estáticos para validação de entradas de TAREFAS. Utiliza a biblioteca Joi.
+ * Os métodos também tratam de instanciar os erros de validação a serem enviados nas respostas de requisições http 
+ */
+export class TaskValidator {
+  static async validateCreate({ title, description, deadline, priority }) {
+    try{
+
+      const schema = Joi.object({
+        title: Joi.string()
+          .min(3)
+          .max(50)
+          .required()
+          .messages({
+            "string.base": "O título deve ser um texto",
+            "string.min": "O título precisa ter no mínimo 3 caracteres",
+            "string.max": "O título precisa ter no máximo 50 caracteres",
+            "any.required": "O título é obrigatório"
+          }),
+
+        description: Joi.string()
+          .max(300)
+          .allow(null)
+          .messages({
+            "string.base": "A descrição deve ser um texto",
+            "string.max": "A descrição precisa ter no máximo 300 caracteres",
+          }),
+
+        deadline: Joi.string()
+          .required()
+          .isoDate()
+          .messages({
+            "date.format": "O formato da data deve ser YYYY-MM-DD HH:mm:ss",
+            "any.required": "O prazo é obrigatório"
+          }),
+
+        priority: Joi.string()
+          .valid(...Object.values(priorityEnum))
+          .required()
+          .messages({
+            "any.only": `A prioridade deve ser um dos valores: ${Object.values(priorityEnum).join(", ")}`,
+            "string.base": "A prioridade deve ser um texto",
+            "any.required": "A prioridade é obrigatória"
+          }),
+
+      });
+
+      await schema.validateAsync({ title, description, deadline, priority });
+    } catch(e){
+      throw new JoiValidatorError(e.message);
+    }
+  }
+
+  static async validateUpdate({ title, description, deadline, priority, status }) {
+    try{
+
+      const schema = Joi.object({
+        title: Joi.string()
+          .min(3)
+          .max(50)
+          .optional()
+          .messages({
+            "string.base": "O título deve ser um texto",
+            "string.min": "O título precisa ter no mínimo 3 caracteres",
+            "string.max": "O título precisa ter no máximo 50 caracteres",
+          }),
+
+        description: Joi.string()
+          .max(300)
+          .optional()
+          .allow(null)
+          .messages({
+            "string.base": "A descrição deve ser um texto",
+            "string.max": "A descrição precisa ter no máximo 300 caracteres",
+          }),
+
+        deadline: Joi.string()
+          .isoDate()
+          .optional()
+          .messages({
+            "date.format": "O formato da data deve ser YYYY-MM-DD HH:mm:ss"
+          }),
+
+        priority: Joi.string()
+          .valid(...Object.values(priorityEnum))
+          .optional()
+          .messages({
+            "any.only": `A prioridade deve ser um dos valores: ${Object.values(priorityEnum).join(", ")}`,
+            "string.base": "A prioridade deve ser um texto",
+          }),
+
+        status: Joi.string()
+          .valid(...Object.values(statusEnum))
+          .optional()
+          .messages({
+            "any.only": `O status deve ser um dos valores: ${Object.values(priorityEnum).join(", ")}`,
+            "string.base": "O status deve ser um texto",
+          }),
+
+      });
+
+      await schema.validateAsync({ title, description, deadline, priority, status });
+    } catch(e){
+      throw new JoiValidatorError(e.message);
+    }
+  }
 }
