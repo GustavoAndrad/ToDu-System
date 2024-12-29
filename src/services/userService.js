@@ -104,11 +104,6 @@ class UserService{
   }
 
   static async deleteUser(id){
-    const user = await database("User").select("*").where({id});
-    if(!user){
-      throw new UserNotFound();
-    }
-
     await database("User").where({id}).del();
   }
 

@@ -1,0 +1,1115 @@
+openapi: 3.0.0
+info:
+  title: ToDu API
+  description: Sistema de gerenciamento de tarefas.
+  version: 1.0.0
+  contact:
+    name: Developer!
+    email: gustavoandrade0125@gmail.com
+externalDocs:
+  description: Documentação Externa
+  url: https://www.notion.so/ToDu-System-1-0-0-d1e61f25fd204e17b6253c142b4e571c
+servers:
+  - url: http://localhost:3000
+    description: Servidor de Desenvolvimento. Porta variável
+tags:
+  - name: Auxiliares
+    description: Serviços auxiliares para desenvolvedores
+  - name: Usuarios
+    description: Operações relacionadas a usuários
+  - name: Tarefas
+    description: Gerenciamento de tarefas do usuário
+  - name: Verificação em 2 Etapas
+    description: Processos da Autenticação em 2 Fatores
+paths:
+  /:
+    get:
+      tags:
+        - Auxiliares
+      summary: Retorna a confirmação da conexão com a API
+      responses:
+        '200':
+          description: Conexão bem sucedida
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "✔ Server connection successfully established"
+
+  /docs:
+    get:
+      tags:
+        - Auxiliares
+      summary: Acesso direto à documentação
+      description: Rota de acesso direto à documentação
+      responses:
+        '200':
+          description: Documentação carregada com sucesso
+          content:
+            text/html:
+              schema:
+                type: string
+                example: "<html><body><h1>A documentação aparece aqui!</h1></body></html>"
+
+  /user:
+    get:
+      tags:
+        - Usuarios
+      summary: Lista as informações do usuário autenticado
+      security:
+        - Authorization: []
+      responses:
+        '200':
+          description: Operação bem sucedida
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ID:
+                    type: string
+                    example: "cbaf53db-57b0-4265-916e-a5e9205ab8b9"
+                    description: id público do usuário
+                  NAME:
+                    type: string
+                    example: "Gustavo Andrade"
+                    description: nome do usuário
+                  DATE_BIRTH:
+                    type: string
+                    format: date
+                    example: "1870-10-15"
+                    description: data de nascimento do usuário
+                  EMAIL:
+                    type: string
+                    format: email
+                    example: "g*****************@gmail.com"
+                    description: email do usuário
+                  NOTIFICATE:
+                    type: boolean
+                    example: true
+                    description: o usuário quer receber notificações?
+                  HOURS_NOTIFICATION:
+                    type: integer
+                    example: 24
+                    description: distância do prazo para ser notificado
+
+        '400':
+          description: Formato da requisição incorreto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+
+        '401':
+          description: Operação não autorizada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+
+        '404':
+          description: Dado solicitado não encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+
+        '500':
+          description: Erro interno do servidor
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+    
+    post:
+      tags:
+        - Usuarios
+      summary: Cria um novo usuário
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: "Guga"
+                date:
+                  type: string
+                  format: date
+                  example: "2005-01-01"
+                email:
+                  type: string
+                  format: email
+                  example: "gustavoandrade0125@gmail.com"
+                password:
+                  type: string
+                  example: "12345678"
+                repeat_password:
+                  type: string
+                  example: "12345678"
+                notificate:
+                  type: boolean
+                  example: false
+                  required: false
+            required:
+              - name
+              - date
+              - email
+              - password
+              - repeat_password
+      responses:
+        '201':
+          description: Usuário criado com sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Sucessfully Created"
+                  public_id:
+                    type: string
+                    example: "cbaf53db-57b0-4265-916e-a5e9205ab8b9"
+
+        '400':
+          description: Dados inválidos ou incompletos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+        
+        '401':
+          description: Operação não autorizada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+        
+        '500':
+          description: Erro interno do servidor
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+
+    patch:
+      tags:
+        - Usuarios
+      summary: Atualiza os dados de um usuário autenticado
+      security:
+        - Authorization: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: "Guga"
+                  required: false
+                date:
+                  type: string
+                  format: date
+                  example: "2005-01-01"
+                  required: false
+                notificate:
+                  type: boolean
+                  example: false
+                  required: false
+                hour_notification:
+                  type: number
+                  example: 12
+                  required: false
+      responses:
+        '200':
+          description: Usuário atualizado com sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Sucessfully Updated"
+
+        '400':
+          description: Dados inválidos ou incompletos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+        
+        '401':
+          description: Operação não autorizada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+
+        '404':
+          description: Dado solicitado não encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+        
+        '500':
+          description: Erro interno do servidor
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+ 
+  /user/danger:
+    patch:
+      tags:
+        - Usuarios
+      summary: Atualiza os dados SENSÍVEIS de um usuário autenticado
+      security:
+        - Authorization: []
+        - Permission_2FA: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                actual_email:
+                  type: string
+                  format: email
+                  example: "gustavoandrade0125@gmail.com"
+                  required: false
+                  description: Obrigatório somente se o complementar estiver presente
+                new_email:
+                  type: string
+                  format: email
+                  example: "new_gustavoandrade0125@gmail.com"
+                  required: false
+                  description: Obrigatório somente se o complementar estiver presente
+                actual_password:
+                  type: string
+                  example: "12345678"
+                  required: false
+                  description: Obrigatório somente se o complementar estiver presente
+                new_password:
+                  type: string
+                  example: "123456789"
+                  required: false
+                  description: Obrigatório somente se o complementar estiver presente
+      responses:
+        '200':
+          description: Usuário atualizado com sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Sucessfully Updated"
+
+        '400':
+          description: Dados inválidos ou incompletos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+        
+        '401':
+          description: Operação não autorizada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+
+        '404':
+          description: Dado solicitado não encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+        
+        '500':
+          description: Erro interno do servidor
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+    
+    delete:
+      tags:
+        - Usuarios
+      summary: Exclui PERMANENTEMENTE o usuário autenticado
+      security:
+        - Authorization: []
+        - Permission_2FA: []
+        - Permission_Password: []
+      responses:
+        '200':
+          description: Usuário atualizado com sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Sucessfully Deleted"
+        '400':
+          description: Formato da requisição incorreto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+
+        '401':
+          description: Operação não autorizada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+
+        '404':
+          description: Dado solicitado não encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+
+        '500':
+          description: Erro interno do servidor
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+
+  /user/login:
+    post:
+      tags:
+        - Usuarios
+      summary: Concede permissão para um usuário cadastrado
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: "gustavoandrade0125@gmail.com"
+                password:
+                  type: string
+                  example: "12345678"
+            required:
+              - email
+              - password
+      responses:
+        '200':
+          description: Operação bem sucedida
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImNiYWY1M2RiLTU3YjAtNDI2NS05MTZlLWE1ZTkyMDVhYjhiOSIsImlhdCI6MTczNTQzNDQ3MywiZXhwIjoxNzM1NTIwODczfQ.y2us5eNh64qn6ATNMIymRpyhpSsxEJM5AhxTBZv_qAc"
+
+        '400':
+          description: Dados inválidos ou incompletos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+
+        '404':
+          description: Dado solicitado não encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+        
+        '500':
+          description: Erro interno do servidor
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+   
+  /user/verifyPassword:
+    post:
+      tags:
+        - Usuarios
+      summary: Concede permissão temporária para um usuário cadastrado
+      security:
+        - Authorization: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                password:
+                  type: string
+                  example: "12345678"
+            required:
+              - password
+      responses:
+        '200':
+          description: Operação bem sucedida
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  verified_pass_token:
+                    type: string
+                    example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImNiYWY1M2RiLTU3YjAtNDI2NS05MTZlLWE1ZTkyMDVhYjhiOSIsImlhdCI6MTczNTQzNDQ3MywiZXhwIjoxNzM1NTIwODczfQ.y2us5eNh64qn6ATNMIymRpyhpSsxEJM5AhxTBZv_qAc"
+
+        '400':
+          description: Dados inválidos ou incompletos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+
+        '401':
+          description: Operação não autorizada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+
+        '404':
+          description: Dado solicitado não encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+        
+        '500':
+          description: Erro interno do servidor
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+
+  /two_factor/sendCode:
+    post:
+      tags:
+        - Verificação em 2 Etapas
+      summary: Envia código de verificação para o usuário autenticado
+      security:
+        - Authorization: []
+      responses:
+        '200':
+          description: Operação bem sucedida
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                    example: "Código enviado para g***************@gmail.com"
+                    description: Confirmação d eenvo
+        '400':
+          description: Formato da requisição incorreto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+
+        '401':
+          description: Operação não autorizada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+
+        '500':
+          description: Erro interno do servidor
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+
+  /two_factor/verifyCode:
+    post:
+      tags:
+        - Verificação em 2 Etapas
+      summary: Verifica código de autorização enviado por email
+      security:
+        - Authorization: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                code:
+                  type: integer
+                  example: 12345
+            required:
+              - code
+      responses:
+        '200':
+          description: Operação bem sucedida
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  temporary_permission_token:
+                    type: string
+                    example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImNiYWY1M2RiLTU3YjAtNDI2NS05MTZlLWE1ZTkyMDVhYjhiOSIsImlhdCI6MTczNTQzNDQ3MywiZXhwIjoxNzM1NTIwODczfQ.y2us5eNh64qn6ATNMIymRpyhpSsxEJM5AhxTBZv_qAc"
+        '400':
+          description: Formato da requisição incorreto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+
+        '401':
+          description: Operação não autorizada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+
+        '500':
+          description: Erro interno do servidor
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+
+  /task:
+    post:
+      tags:
+        - Tarefas
+      summary: Criação de uma nova tarefa
+      description: Cria uma nova tarefa no sistema para o usuário autenticado.
+      security:
+        - Authorization: []
+      parameters:
+        - name: Timezone
+          in: header
+          required: false
+          description: Header opcional para definição da timezone referenciada. Default resulta em America/São_Paulo
+          schema:
+            type: string
+            example: "America/Los_Angeles"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  description: Título da tarefa
+                  example: "Contrator Gustavo Andrade"
+                deadline:
+                  type: string
+                  format: date-time
+                  description: Prazo final para a conclusão da tarefa
+                  example: "2024-12-29 12:00"
+                description:
+                  type: string
+                  description: Detalhes sobre a tarefa
+                  example: "Contactar gustavoandrade@gmail.com e fazer uma proposta de emprego para Gustavo"
+                  required: false
+                priority:
+                  type: string
+                  enum: [LOW, MEDIUM, HIGH]
+                  description: Prioridade da tarefa
+                  example: "HIGH"
+              required:
+                - title
+                - deadline
+                - priority
+      responses:
+        '201':
+          description: Tarefa criada com sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Mensagem de confirmação
+                    example: "Sucessfully Created"
+                  public_id:
+                    type: string
+                    description: Identificador único da tarefa criada
+                    example: "cbaf53db-57b0-4265-916e-a5e9205ab8b9"
+        '400':
+          description: Dados inválidos na requisição
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+        
+        '401':
+          description: Operação não autorizada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+        
+        '404':
+          description: Dado solicitado não encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+        
+        '500':
+          description: Erro interno do servidor
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+    
+  /task/filter:
+    get:
+      tags:
+        - Tarefas
+      summary: Filtra tarefas do usuário autenticado
+      security:
+        - Authorization: []
+      parameters:
+        - name: Timezone
+          in: header
+          required: false
+          description: Header opcional para definição da timezone referenciada. Default resulta em America/São_Paulo
+          schema:
+            type: string
+            example: "America/Los_Angeles"
+        - name: title
+          in: query
+          required: false
+          description: Filtro pelo título da tarefa.
+          schema:
+            type: string
+            example: "Projeto"
+        - name: description
+          in: query
+          required: false
+          description: Filtro pela descrição da tarefa. @!null-set!@ = descrições nulas
+          schema:
+            type: string
+            example: "Terminar os detalhes do ToDu"
+        - name: deadline
+          in: query
+          required: false
+          description: Data exata do prazo (format ==> YYYY-MM-DD HH:MM). Não pode ser inserida junto com deadline_interval.
+          schema:
+            type: string
+            format: date
+            example: "2024-12-29 19:30"
+        - name: deadline_interval
+          in: query
+          required: false
+          description: Intervalo de tempo relativo ao prazo, em horas. ( format==> YYYY-MM-DD HH:MM, YYYY-MM-DD HH:MM ). Não pode ser inserida junto com deadline.
+          schema:
+            type: string
+            format: date
+            example: 2024-12-29 19:30, 2024-12-30 19:30
+        - name: priority
+          in: query
+          required: false
+          description: Prioridade da tarefa (LOW, MEDIUM, HIGH).
+          schema:
+            type: string
+            enum: [LOW, MEDIUM, HIGH]
+            example: "LOW"
+        - name: status
+          in: query
+          required: false
+          description: Status da tarefa.
+          schema:
+            type: string
+            enum: [PENDING, IN PROGESS, DONE, LATE]
+            example: "DONE"
+        - name: amount
+          in: query
+          required: false
+          description: Quantidade máxima de tarefas a serem retornadas.
+          schema:
+            type: integer
+            example: 10
+        - name: order
+          in: query
+          required: false
+          description: Campo para ordenação. Acompanha sempre direction.
+          schema:
+            type: string
+            enum: [ID, ID_USER, TITLE, DESCRIPTION, DEADLINE, STATUS, PRIORITY]
+            example: "deadline"
+        - name: direction
+          in: query
+          required: false
+          description: Direção da ordenação (ASC ou DESC). Acompanha smepre order;
+          schema:
+            type: string
+            enum: [asc, desc]
+            example: "asc"
+      responses:
+        '200':
+          description: Lista de tarefas filtradas com sucesso.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  amount:
+                    type: integer
+                    description: Quantidade de tarefas retornadas.
+                    example: 1
+                  timezone:
+                    type: string
+                    description: Fuso horário do usuário autenticado.
+                    example: "America/Sao_Paulo"
+                  tasks:
+                    type: array
+                    description: Lista de tarefas filtradas.
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          example: "cbaf53db-57b0-4265-916e-a5e9205ab8b9"
+                        id_user:
+                          type: string
+                          example: "xpty53db-57d0-42d5-91ce-a5e9sd05ab8d9"
+                        title:
+                          type: string
+                          example: "Terminar Projeto"
+                        description:
+                          type: string
+                          example: "Terminar os detalhes do ToDu"
+                        deadline:
+                          type: string
+                          example: "2024-12-29 19:30"
+                        priority:
+                          type: string
+                          example: "LOW"
+                        status:
+                          type: string
+                          example: "PENDING"
+        '400':
+          description: Parâmetros inválidos na requisição.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+
+        '401':
+          description: Não autorizado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+
+        '404':
+          description: Dado solicitado não encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+
+        '500':
+          description: Erro interno do servidor.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+
+  /task/{id}:
+    get:
+      tags:
+        - Tarefas
+      summary: Busca uma tarefa de um usuário autenticado
+      security:
+        - Authorization: []
+      parameters:
+        - name: Timezone
+          in: header
+          required: false
+          description: Header opcional para definição da timezone referenciada. Default resulta em America/São_Paulo
+          schema:
+            type: string
+            example: "America/Los_Angeles"
+        - name: id
+          in: path
+          required: true
+          description: Identificador único da tarefa.
+          schema:
+            type: string
+            format: uuid
+            example: "cbaf53db-57b0-4265-916e-a5e9205ab8b9"
+      responses:
+        '200':
+          description: Lista de tarefas filtradas com sucesso.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  timezone:
+                    type: string
+                    description: Fuso horário do usuário autenticado.
+                    example: "America/Sao_Paulo"
+                  task:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: "cbaf53db-57b0-4265-916e-a5e9205ab8b9"
+                      id_user:
+                        type: string
+                        example: "xpty53db-57d0-42d5-91ce-a5e9sd05ab8d9"
+                      title:
+                        type: string
+                        example: "Terminar Projeto"
+                      description:
+                        type: string
+                        example: "Terminar os detalhes do ToDu"
+                      deadline:
+                        type: string
+                        example: "2024-12-29 19:30"
+                      priority:
+                        type: string
+                        example: "LOW"
+                      status:
+                        type: string
+                        example: "PENDING"
+        '400':
+          description: Parâmetros inválidos na requisição.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+
+        '401':
+          description: Não autorizado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+
+        '404':
+          description: Dado solicitado não encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+
+        '500':
+          description: Erro interno do servidor.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+  
+    patch:
+      tags:
+        - Tarefas
+      summary: Atualização de uma tarefa existente
+      description: Modifica os atributos de uma tarefa existente
+      security:
+        - Authorization: []
+      parameters:
+        - name: Timezone
+          in: header
+          required: false
+          description: Header opcional para definição da timezone referenciada. Default resulta em America/São_Paulo
+          schema:
+            type: string
+            example: "America/Los_Angeles"
+        - name: id
+          in: path
+          required: true
+          description: Identificador único da tarefa.
+          schema:
+            type: string
+            format: uuid
+            example: "cbaf53db-57b0-4265-916e-a5e9205ab8b9"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  description: Título da tarefa
+                  required: false
+                  example: "Contrator Gustavo Andrade"
+                deadline:
+                  type: string
+                  format: date-time
+                  description: Prazo final para a conclusão da tarefa
+                  required: false
+                  example: "2024-12-29 12:00"
+                description:
+                  type: string
+                  description: Detalhes sobre a tarefa
+                  required: false
+                  example: "Contactar gustavoandrade@gmail.com e fazer uma proposta de emprego para Gustavo"
+                  required: false
+                priority:
+                  type: string
+                  enum: [LOW, MEDIUM, HIGH]
+                  description: Prioridade da tarefa
+                  required: false
+                  example: "HIGH"
+                status:
+                  type: string
+                  enum: [PENDING, IN PROGRESS, DONE]
+                  description: Estado da tarefa
+                  required: false
+                  example: "IN PROGRESS"
+      responses:
+        '200':
+          description: Tarefa atualizada com sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Mensagem de confirmação
+                    example: "Sucessfully Updated"
+        '400':
+          description: Dados inválidos na requisição
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+        
+        '401':
+          description: Operação não autorizada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+        
+        '404':
+          description: Dado solicitado não encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+        
+        '500':
+          description: Erro interno do servidor
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+    
+    delete:
+      tags:
+        - Tarefas
+      summary: Excluir PERMANENTEMENTE uma tarefa
+      security:
+        - Authorization: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Identificador único da tarefa.
+          schema:
+            type: string
+            format: uuid
+            example: "cbaf53db-57b0-4265-916e-a5e9205ab8b9"
+      responses:
+        '200':
+          description: Tarefa removida com sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Task Deleted"
+        '400':
+          description: Formato da requisição incorreto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+        '401':
+          description: Operação não autorizada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+        '404':
+          description: Dado solicitado não encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+        '500':
+          description: Erro interno do servidor
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+
+components:
+  securitySchemes:
+    Authorization:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Token de autenticação padrão ( obtido em /user/login )
+
+    Permission_2FA:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Token de autenticação para operações sensíveis ( obtido em /two_factor/verifyCode )
+
+    Permission_Password:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Token de confirmação da operação de verificação de senha para operações sensíveis (obtido em /user/verifyPassword )
+
+
+  schemas:
+    Erro:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 999
+          description: Código HTTP do erro
+        message:
+          type: string
+          example: "..."
+          description: Mensagem detalhada do erro
+

@@ -201,7 +201,7 @@ const statusEnum = {
   PENDING: "PENDING",
   DONE: "DONE",
   IN_PROGRESS: "IN PROGRESS",
-  LATE: "LATE"
+  // LATE: "LATE" --> estado possível, mas de responsabilidade do sistema
 };
 
 const priorityEnum = {
@@ -305,7 +305,7 @@ export class TaskValidator {
           .valid(...Object.values(statusEnum))
           .optional()
           .messages({
-            "any.only": `O status deve ser um dos valores: ${Object.values(priorityEnum).join(", ")}`,
+            "any.only": `O status deve ser um dos valores: ${Object.values(statusEnum).join(", ")}`,
             "string.base": "O status deve ser um texto",
           }),
 

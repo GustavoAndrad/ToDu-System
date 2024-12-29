@@ -2,7 +2,8 @@ import user_router from "./userRoutes.js";
 import two_factor_router from "./twoFactorVerifyRoutes.js";
 import task_router from "./taskRoutes.js";
 import express from "express";
-import { handleRouter404Error } from "../middleware/handle_erro_404.js";
+import handleRouter404Error from "../middleware/handle_erro_404.js";
+import swaggerRoute from "../../_documantation/swagger-setup.js";
 
 /**
  * @description Mapeia as rotas da API
@@ -19,6 +20,10 @@ const routes = (app) => {
     .use(user_router)
     .use(two_factor_router)
     .use(task_router);
+
+  // Documentação da API
+  app. 
+    use(swaggerRoute);
 
   // Teste de conexão com a API
   app
