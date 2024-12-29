@@ -8,15 +8,32 @@ const user_router = Router();
 
 user_router
   .post("/user", UserController.createUser)
-  .get("/user", login_auth, UserController.getUser)
-  .patch("/user", login_auth, UserController.updateUser)
+
+  .get("/user", 
+    login_auth, 
+    UserController.getUser)
+
+  .patch("/user", 
+    login_auth, 
+    UserController.updateUser)
 
   //Operações dependentes de autorizações especiais
-  .patch("/user/danger", login_auth, two_factor_permission, UserController.dangerUpdateUser)
-  .delete("/user/danger", login_auth, two_factor_permission, password_permission, UserController.deleteUser)
+  .patch("/user/danger", 
+    login_auth, 
+    two_factor_permission, 
+    UserController.dangerUpdateUser)
 
-  //Autenticações
+  .delete("/user/danger", 
+    login_auth, 
+    two_factor_permission, 
+    password_permission, 
+    UserController.deleteUser)
+
+  //Operações para autenticações de credenciais
   .post("/user/login", UserController.login)
-  .post("/user/verifyPassword", login_auth, UserController.verifyPassword);
+
+  .post("/user/verifyPassword", 
+    login_auth, 
+    UserController.verifyPassword);
 
 export default user_router;

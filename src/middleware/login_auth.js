@@ -27,7 +27,6 @@ export default function authentication_login(req, res, next){
       }  
     });
 
-
   }catch(e){
     
     console.log(e);

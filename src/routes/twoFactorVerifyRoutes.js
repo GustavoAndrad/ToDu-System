@@ -4,6 +4,7 @@ import TwoFactorVerifyController from "../controllers/twoFactorVerifyController.
 
 const two_factor_router = Router();
 
+// Verificação de 2 fatores para operações críticas. Autenticação necessária!
 two_factor_router
   .post("/two_factor/sendCode", login_auth, TwoFactorVerifyController.sendCode)
   .post("/two_factor/verifyCode", login_auth, TwoFactorVerifyController.verifyCode);

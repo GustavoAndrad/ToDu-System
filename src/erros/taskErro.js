@@ -19,7 +19,7 @@ export class DependentPropertyNotInformed extends HttpErro{
 }
 
 export class InvalidDeadlineFormat extends HttpErro{
-  constructor(message = "Prazo inválido. Formato esperado (América/São Paulo): YYYY-MM-DD HH:MM"){
+  constructor(message = "Prazo inválido. Formato esperado (ISO): YYYY-MM-DD HH:MM"){
     super(HttpCode.BAD_REQUEST, message);
   }
 }
@@ -38,6 +38,12 @@ export class InvalidDirection extends HttpErro{
 
 export class DeadlineTooClose extends HttpErro{
   constructor(message = "O prazo deve ser de, no mínimo, mais que 30 minutos"){
+    super(HttpCode.BAD_REQUEST, message);
+  }
+}
+
+export class DeniedOperationOnLateTask extends HttpErro{
+  constructor(message = "Tarefas atrasadas só podem ser concluídas ou deletadas"){
     super(HttpCode.BAD_REQUEST, message);
   }
 }

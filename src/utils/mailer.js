@@ -17,6 +17,7 @@ class Mailer {
     });
   }
 
+  
   /**
    * @description Envia um e-mail contendo um código de verificação para o usuário especificado.
    * Retorna um objeto {status: boolean, message: string}.
@@ -26,8 +27,9 @@ class Mailer {
    * @param {string} user_email - O e-mail do usuário que receberá o código de verificação.
    * @returns {Promise<{status: boolean, message: string}>} - Um objeto contendo o status booleno e uma string ['ok' ou <mensagem de erro>].
    * @async 
-   */
+  */
   async sendCodeMail(code, user_email) {
+
     const mailOptions = {
       from: `"ToDu Team 💙💛" <${process.env.EMAIL_USER}>`,
       to: user_email,
@@ -108,6 +110,110 @@ class Mailer {
             </body>
 
             </html>
+        `,
+    };
+
+    try {
+      await this.transporter.sendMail(mailOptions);
+      return {status: true, message: "ok"};
+
+    } catch (error) {
+      return {status: false, message: error.message};
+    }
+  }
+
+  
+  /**
+   * @description Envia um e-mail de notificação sobre o prazo de uma tarefa
+   * Retorna um objeto {status: boolean, message: string}.
+   * Caso dê certo: {status: true, message: "ok"}, caso não: {status: false, message: <ERROR_MESSAGE>}
+   * 
+   * @param {*} user_name Nome do usuário
+   * @param {*} user_email Email do usuário
+   * @param {*} task_name Nome da tarefa
+   * @param {*} hour_notificate Qunatidades de horas para o fim do prazo
+   * 
+   * @returns {Promise<{status: boolean, message: string}>} - Um objeto contendo o status booleno e uma string ['ok' ou <mensagem de erro>].
+   * @async 
+  */
+  async sendTaskNotification(user_name, user_email, task_name, hour_notificate){
+    const mailOptions = {
+      from: `"ToDu Team 💙💛" <${process.env.EMAIL_USER}>`,
+      to: user_email,
+      subject: "Task Reminder  ⏰",
+      html: `
+           <!DOCTYPE html>
+            <html>
+
+            <head>
+                <meta charset="utf-8">
+                <meta name="viewport" content="width=device-width">
+                <title>Two Factor Verification</title>
+                <style>
+                    * {
+                        font-family: 'Verdana', 'sans-serif';
+                    }
+
+                    body {
+                        height: 100%;
+                        width: 100%;
+                    }
+
+                    header {
+                        background-color: #FFEA05;
+                        width: 100%;
+                        color: #3E3E96;
+                        padding-top: 1%;
+                        padding-bottom: 1%;
+                        border-radius: 100px;
+                    }
+
+                    h1 {
+                        width: 100%;
+                        text-align: center;
+                    }
+
+                    main {
+                        width: 100%;
+                        margin-top: 10px;
+                    }
+
+                    footer {
+                        color: darkred;
+                        width: 100%;
+                    }
+
+                    p {
+                        font-weight: bold;
+                        width: 100%;
+                        text-align: center;
+                    }
+
+                    #code {
+                        color: #3E3E96;
+                        font-size: 20px;
+                    }
+
+                    #time {
+                        color: darkred;
+                    }
+                </style>
+            </head>
+
+            <body>
+                <header>
+                    <h1>This is your reminder</h1>
+                </header>
+                <main>
+                    <p>${user_name}, remember that the deadline for the task <u>'${task_name}'</u> is in ${hour_notificate} hours!!</p>
+                </main>
+                <footer>
+                    <p>If you did not request this, please ignore this email</p>
+                </footer>
+            </body>
+
+            </html>
+
         `,
     };
 

@@ -2,8 +2,9 @@ import { v4 } from "uuid";
 import database from "../database/index.js";
 import { TaskValidator } from "../utils/joi_validator.js";
 import { addMinutes, isBefore, parse, format } from "date-fns";
-import { fromZonedTime } from "date-fns-tz";
-import { DeadlineConflict, DeadlineTooClose, DependentPropertyNotInformed, InvalidDeadlineFormat, InvalidDirection, PropertyNotFound, TaskNotFound } from "../erros/taskErro.js";
+import { fromZonedTime, toZonedTime } from "date-fns-tz";
+import { DeadlineConflict, DeadlineTooClose, DeniedOperationOnLateTask, DependentPropertyNotInformed, InvalidDeadlineFormat, InvalidDirection, PropertyNotFound, TaskNotFound } from "../erros/taskErro.js";
+import { ProcessTimezoneError } from "../erros/erro.config.js";
 
 
 class taskService{
@@ -16,33 +17,42 @@ class taskService{
   }
 
   /** @private */
-  static #is_deadline_far_enough(deadline){
-    const time_zone = "America/Sao_Paulo"; // Versão 1.0.0 projetada para essa timezone. Buscar maneira mais escalável.
+  static #is_deadline_far_enough(deadline, timezone){
 
     const deadline_date = parse(deadline, "yyyy-MM-dd HH:mm", new Date());
-    const deadline_date_utc = fromZonedTime(deadline_date, time_zone);
+    const thirty_minutes_in_future = toZonedTime(addMinutes(new Date(), 30),timezone);
 
-    const now = new Date();
-    const thirty_minutes_in_future = addMinutes(now, 30);
-
-    if(isBefore(deadline_date_utc, thirty_minutes_in_future)){
+    if(isBefore(deadline_date, thirty_minutes_in_future)){
       return false;
     }
 
     return true;
   }
 
-  static async getTaskById(user_id, id){
+  /**@private */
+  static #verify_date_conversion(date){
+    if(isNaN(date.getTime())){
+      return false;
+    }
+    return true;
+  }
+
+  static async getTaskById(user_id, timezone, id){
     const task = await database("Task").select("*").where("ID_USER", user_id).andWhere("ID", id).first();
 
     if(!task) throw new TaskNotFound();
 
+    task.DEADLINE = toZonedTime(task.DEADLINE, timezone);
+    if(!(this.#verify_date_conversion(task.DEADLINE))) {
+      throw new ProcessTimezoneError("Data inválida após processamento de conversão de UTC para timezone");
+    }
+    
     task.DEADLINE = format(new Date(task.DEADLINE), "yyyy-MM-dd HH:mm");
     return task;
   }
 
   static async getTask(
-    {user_id, title, description, deadline, deadline_interval, priority, status, amount, order, direction}){
+    {user_id, timezone, title, description, deadline, deadline_interval, priority, status, amount, order, direction}){
     
     //Não pode ser definido um prazo e um intervalo de prazo na mesma requisição
     if(deadline && deadline_interval) throw new DeadlineConflict(); 
@@ -62,13 +72,18 @@ class taskService{
     if (title) query = query.andWhere("TITLE", "like", `%${title}%`);
 
     if (deadline) {
-
       if(!(this.#validate_date_format(deadline))) throw new InvalidDeadlineFormat();
-      
-      query = query.andWhere("DEADLINE", deadline);
+
+      const utc_deadline = fromZonedTime(deadline, timezone);
+      if(!(this.#verify_date_conversion(utc_deadline))){
+        throw new ProcessTimezoneError("Data inválida após processamento de conversão de timezone para UTC");
+      }
+
+      query = query.andWhere("DEADLINE", utc_deadline);
     }
 
     if (deadline_interval) {
+      //YYYY-MM-DD HH:MM, YYYY-MM-DD HH:MM
       const [bottom, top] = deadline_interval.split(", ");
 
       if(!top || !bottom){
@@ -79,9 +94,15 @@ class taskService{
         throw new InvalidDeadlineFormat();
       }
 
-      query = query.whereBetween("DEADLINE", [bottom, top]);
+      const utc_bottom = fromZonedTime(bottom, timezone);
+      const utc_top = fromZonedTime(top, timezone);
+
+      if((!(this.#verify_date_conversion(utc_bottom)) || (!(this.#verify_date_conversion(utc_top))))){
+        throw new ProcessTimezoneError("Data inválida após processamento de conversão de timezone para UTC");
+      }
+
+      query = query.whereBetween("DEADLINE", [utc_bottom, utc_top]);
     }
-    
 
     if (description) {
       if (description==="@!null-set!@") {
@@ -91,16 +112,13 @@ class taskService{
         query = query.andWhere("DESCRIPTION", "like", `%${description}%`);
       }
     }
-
     
     if (order && direction) {
 
       const columns_database = await database("Task").columnInfo();
-      /*
-        columns_database.hasOwnProperty(order) funcionaria, mas, por segurança de impelementação (evitar acessar um método sobrescrito),
-        acessei por Object mesmo que implicasse em uma estrutura um pouco mais verbosa 
-      */
-      if(!Object.prototype.hasOwnProperty.call(columns_database, order.toUpperCase())){ //Verificando se a propriedade para ordenar existe
+
+      //Verificando se a propriedade para ordenar existe
+      if(!Object.prototype.hasOwnProperty.call(columns_database, order.toUpperCase())){ 
         throw new PropertyNotFound();
       }
 
@@ -116,28 +134,40 @@ class taskService{
       }
     }
     
-
+    //Execução da requisição ao banco de dados
     const task = await query;
 
     if(task.length===0){
       throw new TaskNotFound();
     }
 
-    //Formatando prazos para YYYY-MM-DD HH:MM
+    //Formatando prazos para YYYY-MM-DD HH:MM e na timezona solicitada para facilitar interpretação
     for (const item of task) {
-      item.DEADLINE = format(new Date(item.DEADLINE), "yyyy-MM-dd HH:mm");
+      
+      const zoned_deadline = toZonedTime(item.DEADLINE, timezone);
+      if(!this.#verify_date_conversion(zoned_deadline)){
+        throw new ProcessTimezoneError("Data inválida após processamento de conversão de UTC para timezone");
+      }
+
+      item.DEADLINE = format(zoned_deadline, "yyyy-MM-dd HH:mm");
     }
 
     return task;
 
   }
 
-  static async createTask(user_id, title, description, deadline, priority){
+  static async createTask(user_id, timezone, title, description, deadline, priority){
 
     await TaskValidator.validateCreate({title, description, deadline, priority});
 
-    if(!this.#is_deadline_far_enough(deadline)){
+    if(!this.#is_deadline_far_enough(deadline, timezone)){
       throw new DeadlineTooClose();
+    }
+
+    //Datas são sempre armazenadas no banco como UTC
+    const utc_deadline = fromZonedTime(deadline, timezone);
+    if(!this.#verify_date_conversion(utc_deadline)){
+      throw new ProcessTimezoneError("Data inválida após processamento de conversão de timezone para UTC");
     }
 
     const task_set = {
@@ -145,23 +175,46 @@ class taskService{
       ID_USER: user_id,
       TITLE: title,
       DESCRIPTION: description,
-      DEADLINE: deadline,
+      DEADLINE: utc_deadline,
       PRIORITY: priority
     };
-
+    
     await database("Task").insert(task_set);
 
     return task_set.ID;
   }
 
-  static async updateTask(user_id, id, title, description, deadline, priority, status){
+  static async handleUpdateLateTask(status, user_id, id){
+    if(!status || (status.toUpperCase())!=="DONE"){
+      throw new DeniedOperationOnLateTask();
+    }
 
-    await this.getTaskById(user_id, id);
+    // Removendo tarefa feita cujo prazo já passou
+    await this.deleteTask(user_id,id);
 
+  }
+
+  static async updateTask(user_id, id, timezone, title, description, deadline, priority, status){
+
+    const task = await this.getTaskById(user_id, timezone, id);
+    
+    if((task.STATUS.toUpperCase())==="LATE"){ // Tarefas atrasadas só podem ser marcadas como feitas
+      return await this.handleUpdateLateTask(status, user_id, id);
+    }
+    
     await TaskValidator.validateUpdate({title, description, deadline, priority, status});
 
+    
     if(deadline){
-      if(!this.#is_deadline_far_enough(deadline)) throw new DeadlineTooClose();
+      if(!this.#is_deadline_far_enough(deadline, timezone)){
+        throw new DeadlineTooClose();
+      }
+    
+      //Datas são sempre armazenadas no banco como UTC
+      const utc_deadline = fromZonedTime(deadline, timezone);
+      if(!this.#verify_date_conversion(utc_deadline)){
+        throw new ProcessTimezoneError("Data inválida após processamento de conversão de timezone para UTC");
+      }
     }
 
     const new_task_set = {
@@ -179,7 +232,7 @@ class taskService{
 
   static async deleteTask(user_id, id){
     
-    await this.getTaskById(user_id, id);
+    await this.getTaskById(user_id, undefined, id);
 
     await database("Task").where({id}).del();
   }

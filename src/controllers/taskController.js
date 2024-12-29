@@ -9,11 +9,12 @@ class TaskController{
     try{
       const user_id = req.user_id;
       const id = req.params.id;
+      const timezone = req.timezone;
       
       await UserService.getUser(user_id); //Verificando se o id confere
-      const task = await taskService.getTaskById(user_id, id);
+      const task = await taskService.getTaskById(user_id, timezone, id);
           
-      res.status(HttpCode.OK).json({task: task});
+      res.status(HttpCode.OK).json({timezone: timezone,task: task});
         
     } catch(e){
     
@@ -32,13 +33,13 @@ class TaskController{
     try{
       const {title, description, deadline, deadline_interval, priority, status, amount, order, direction} = req.query;
       const user_id = req.user_id;
-      console.log(req.url);
+      const timezone = req.timezone;
       
       await UserService.getUser(user_id); //Verificando se o id confere
       const tasks = await taskService.getTask(
-        {user_id, title, description, deadline, deadline_interval, priority, status, amount, order, direction});
+        {user_id, timezone, title, description, deadline, deadline_interval, priority, status, amount, order, direction});
           
-      res.status(HttpCode.OK).json({amount: tasks.length, tasks: tasks});
+      res.status(HttpCode.OK).json({amount: tasks.length, timezone: timezone, tasks: tasks});
         
     } catch(e){
     
@@ -57,9 +58,10 @@ class TaskController{
     try{
       const {title, description, deadline, priority} = req.body;
       const user_id = req.user_id;
+      const timezone = req.timezone;
       
       await UserService.getUser(user_id); //Verificando se o id confere
-      const new_task_id = await taskService.createTask(user_id, title, description, deadline, priority);
+      const new_task_id = await taskService.createTask(user_id, timezone, title, description, deadline, priority);
           
       res.status(HttpCode.CREATED).json({message: "Sucessfully Created", public_id: new_task_id});
         
@@ -81,9 +83,10 @@ class TaskController{
       const {title, description, deadline, priority, status} = req.body;
       const id = req.params.id;
       const user_id = req.user_id;
+      const timezone = req.timezone;
       
       await UserService.getUser(user_id); //Verificando se o id confere
-      await taskService.updateTask(user_id, id, title, description, deadline, priority, status);
+      await taskService.updateTask(user_id, id, timezone, title, description, deadline, priority, status);
           
       res.status(HttpCode.OK).json({message: "Sucessfully Updated"});
         

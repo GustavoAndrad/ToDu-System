@@ -1,5 +1,6 @@
 version: "3.9"
 services: 
+  # BANCO DE DADOS
   todu_database:
     container_name: todu_database
     image: mysql
@@ -10,13 +11,14 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
       MYSQL_DATABASE: ${DB_NAME}
-      MYSQL_USER: root
+      MYSQL_USER: ${DB_USER}
       MYSQL_PASSWORD: ${DB_PASSWORD}
     volumes:
       - todu_database:/var/lib/mysql
     networks:
       - todu_bridge
   
+  # SERVIDOR
   todu_api:
     depends_on:
       - todu_database

@@ -25,7 +25,7 @@ export class HttpErro extends Error{
     if(Object.values(HttpCode).includes(code)){
       this.code = code;
     } else{
-      throw new HttpErro(500, "Um erro aconteceu, mas não foi possiível determinar sua classificação");
+      throw new ImprevistError("Não foi possível determinar a natureza do erro");
     }
     
   }
@@ -66,3 +66,21 @@ export class MailerError extends HttpErro{
     super(HttpCode.INTERNAL_SERVER_ERROR, "Erro ao enviar e-mail: " + message);
   }
 }
+
+export class APITimezoneDBError extends HttpErro{
+  constructor(message = "Erro de conexão com TimezoneDB"){
+    super(HttpCode.INTERNAL_SERVER_ERROR, `Erro ao se comunicar com timezoneDB API: ${message}`);
+  }
+}
+
+export class ProcessTimezoneError extends HttpErro{
+  constructor(message = "Timezone improcessável"){
+    super(HttpCode.BAD_REQUEST, `Erro ao processar modificação de timezone: ${message}`);
+  }
+}   
+
+export class FileSystemException extends HttpErro {
+  constructor(message = "Operação inesperada") {
+    super(HttpCode.BAD_REQUEST, `Falha ao manipular sistema de arquivos: ${message}`);
+  }
+} 

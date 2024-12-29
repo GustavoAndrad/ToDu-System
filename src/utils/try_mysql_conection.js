@@ -17,7 +17,7 @@ async function try_database_conection(){
       port: DB_PORT
     });
 
-    console.log("Successfully connected to the database.");
+    console.log("🎲   Successfully connected to the database.");
     await connection.end();
     return true;
     

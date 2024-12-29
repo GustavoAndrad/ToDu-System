@@ -34,6 +34,7 @@ export default function authorization_password(req, res, next){
 
       }  
     });
+    
   }catch(e){
         
     console.log(e);

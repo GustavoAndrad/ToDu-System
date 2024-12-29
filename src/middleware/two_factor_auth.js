@@ -34,6 +34,7 @@ export default function authorization_2FA(req, res, next){
 
       }  
     });
+    
   }catch(e){
         
     console.log(e);
