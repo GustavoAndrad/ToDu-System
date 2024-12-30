@@ -7,6 +7,7 @@
 -  [Funcionalidades e Modelos](#funcionalidades-e-modelos)
 -  [Tecnologias e Ferramentas](#tecnologias-e-ferramentas)
 -  [Como Rodar Localmente](#como-rodar-localmente)
+-  [Exemplo de Uso](#exemplo-de-uso)
 -  [Desenvolvedor](#desenvolvedor)
 
 ---
@@ -86,6 +87,7 @@ Entre no diretório do projeto:
 ```bash
   cd ToDy_System
 ```
+! Não esqueça de preparar as ``variáveis de ambiente definidas em .env.example` !
 
 Instale as dependências:
 
@@ -116,6 +118,16 @@ Pule as etapas do Docker, rode as migartions e rode manualmente:
   // Atenção às tecnologias aqui!
 ```
 
+---
+## 🎡 Exemplo de Uso
+
+Saída no console sobre as `operações agendadas`:
+
+![Log dos agendamentos](./images/agendamento.png)
+
+Exemplo de uma `requisição no Insominia`:
+
+![Rotas no insominia](./images/route.png)
 
 ---
 
