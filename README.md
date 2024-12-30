@@ -1,17 +1,17 @@
 
 # ToDu System
 ---
-## Sumário
+## 📘 Sumário
 
--  [Sobre o Projeto](#sobre-o-projeto)
--  [Funcionalidades e Modelos](#funcionalidades-e-modelos)
--  [Tecnologias e Ferramentas](#tecnologias-e-ferramentas)
--  [Como Rodar Localmente](#como-rodar-localmente)
--  [Exemplo de Uso](#exemplo-de-uso)
--  [Desenvolvedor](#desenvolvedor)
+- [🎒 Sobre o Projeto](#🎒-sobre-o-projeto)  
+- [⚙ Funcionalidades e Modelos](#⚙-funcionalidades-e-modelos)  
+- [🛠 Tecnologias e Ferramentas](#🛠-tecnologias-e-ferramentas)  
+- [💻 Como Rodar Localmente](#💻-como-rodar-localmente)  
+- [🎡 Exemplo de Uso](#🎡-exemplo-de-uso)  
+- [👤 Desenvolvedor](#👤-desenvolvedor)
 
 ---
-## Sobre o Projeto
+## 🎒 Sobre o Projeto
 
 
 O `ToDu System` é um software desenvolvido para fixação dos meus conhecimentos em desenvolvimento de API's.
@@ -87,7 +87,7 @@ Entre no diretório do projeto:
 ```bash
   cd ToDy_System
 ```
-! Não esqueça de preparar as ``variáveis de ambiente definidas em .env.example` !
+! Não esqueça de preparar as `variáveis de ambiente definidas em .env.example` !
 
 Instale as dependências:
 
