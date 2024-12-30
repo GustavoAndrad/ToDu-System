@@ -18,7 +18,7 @@ O `ToDu System` é um software desenvolvido para fixação dos meus conhecimento
 ![Logotipo do Software](./images/todu.png)
 
 
-O sistema conta com suporte para manutenção de informações de `Usuários` e permite com que gerenciem suas `Tarefas`. Além disso, conta com `Autenticação em Duas Etapas` (entre outras medidas de segurança e criptografia de dados sensíveis) e com uma lógica de `envio automatizado de e-mails` para notificar os usuários sobre o prazo de suas tarefas e monitoração de seu estado.
+O sistema conta com suporte para manutenção de informações de `Usuários` e permite com que gerenciem suas `Tarefas`. Além disso, conta com `Autenticação em Duas Etapas` (entre outras medidas de segurança e criptografia de dados sensíveis) e com uma lógica de `envio automatizado de e-mails` para notificar os usuários sobre o prazo de suas tarefas e monitoração de seu estado. Um dos grandes diferenciais do sitema é lidar com `qualquer fuso horário` na manipulação das tarefas.
 
 ---
 ## ⚙ Funcionalidades e Modelos 
@@ -28,7 +28,7 @@ O sistema cumpre:
 
 ![Diagrama de Casos de Uso](./images/use_case.png)
 
-![Modelagem da Estrutura do Banco de Dados Relacional](./images\modelagem_bd.png)
+![Modelagem da Estrutura do Banco de Dados Relacional](./images/modelagem_bd.png)
 
 #### 💡 O dicionário de dados, regras de negócio, etc, podem ser consultados na [Documentação Completa](https://www.notion.so/ToDu-System-1-0-0-d1e61f25fd204e17b6253c142b4e571c)
 
