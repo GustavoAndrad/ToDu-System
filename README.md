@@ -3,12 +3,12 @@
 ---
 ## 📘 Sumário
 
-- [🎒 Sobre o Projeto](#🎒-sobre-o-projeto)  
-- [⚙ Funcionalidades e Modelos](#⚙-funcionalidades-e-modelos)  
-- [🛠 Tecnologias e Ferramentas](#🛠-tecnologias-e-ferramentas)  
-- [💻 Como Rodar Localmente](#💻-como-rodar-localmente)  
-- [🎡 Exemplo de Uso](#🎡-exemplo-de-uso)  
-- [👤 Desenvolvedor](#👤-desenvolvedor)
+- [🎒 Sobre o Projeto](#-sobre-o-projeto)  
+- [⚙ Funcionalidades e Modelos](#-funcionalidades-e-modelos)  
+- [🛠 Tecnologias e Ferramentas](#-tecnologias-e-ferramentas)  
+- [💻 Como Rodar Localmente](#-como-rodar-localmente)  
+- [🎡 Exemplo de Uso](#-exemplo-de-uso)  
+- [👤 Desenvolvedor](#-desenvolvedor)
 
 ---
 ## 🎒 Sobre o Projeto
@@ -33,7 +33,7 @@ O sistema cumpre:
 
 #### 💡 O dicionário de dados, regras de negócio, etc, podem ser consultados na [Documentação Completa](https://www.notion.so/ToDu-System-1-0-0-d1e61f25fd204e17b6253c142b4e571c)
 
-Tendo o sistema rodando localmente, acesse a `Documentação com Swagger` :
+Tendo o sistema rodando localmente, acesse a `Documentação da API com Swagger` em :
 
     http://localhost:<PORTA>/docs
 
@@ -76,56 +76,67 @@ Tendo o sistema rodando localmente, acesse a `Documentação com Swagger` :
 ---
 ## 💻 Como rodar localmente
 
-Clone o projeto:
+Clone o projeto :
 
 ```bash
-  https://github.com/GustavoAndrad/ToDu_System.git
+git clone https://github.com/GustavoAndrad/ToDu_System.git
 ```
 
-Entre no diretório do projeto:
+Entre no diretório do projeto :
 
 ```bash
-  cd ToDy_System
+cd ToDu_System
 ```
-! Não esqueça de preparar as `variáveis de ambiente definidas em .env.example` !
+**! Não esqueça de preparar as `variáveis de ambiente definidas em .env.example` !**
+
+### 🐳 Utilizando Docker : 
+
+Instale as dependências :
+
+```bash
+npm install
+```
+
+Construa os conteiners configurados :
+
+```bash
+docker-compose -p todu_project up --build -d
+```
+
+No prompt do conteiner `todu_app`, rode as migrations (redefinindo para usar CommonJS) :
+
+```bash
+npx knex migrate:latest --knexfile knexfile.cjs
+```
+
+### 🍣 Sem usar Docker : 
+**Atenção às tecnologias aqui!**
 
 Instale as dependências:
 
 ```bash
-  npm install
+npm install
 ```
 
-Construa os conteiners configurados:
+Rode as migartions e rode manualmente (fora do conteiner) :
 
 ```bash
-  docker-compose -p todu_project up --build
-  //Executando o compose passando um nome para o projeto
+npx knex migrate:latest --knexfile knexfile.cjs
 ```
 
-No prompt do conteiner `todu_app` 
-
+Rode o projeto :
 ```bash
-    /home/app # npx knex migrate:latest --knexfile knexfile.cjs
-    // Rodando as migrations redefinindo o knexfile para usar CommonJS
-```
-
-### Caso não use o Docker: 
-
-Pule as etapas do Docker, rode as migartions e rode manualmente:
-
-```bash
-  npm run dev
-  // Atenção às tecnologias aqui!
+npm run dev
 ```
 
 ---
 ## 🎡 Exemplo de Uso
 
-Saída no console sobre as `operações agendadas`:
+🔥 Saída no console sobre as `operações agendadas`:
 
 ![Log dos agendamentos](./images/agendamento.png)
 
-Exemplo de uma `requisição no Insominia`:
+🌙 Exemplo de uma `requisição bem sucedida no Insominia`:
 
 ![Rotas no insominia](./images/route.png)
 
